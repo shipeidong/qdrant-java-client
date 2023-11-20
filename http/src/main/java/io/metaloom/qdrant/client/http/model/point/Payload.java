@@ -1,7 +1,7 @@
 package io.metaloom.qdrant.client.http.model.point;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.metaloom.qdrant.client.http.model.RestModel;
@@ -81,9 +81,8 @@ public class Payload implements RestModel {
 	 * 
 	 * @param json
 	 * @return
-	 * @throws JacksonException
 	 */
-	public static Payload of(String json) throws JacksonException {
+	public static Payload of(String json) throws JsonProcessingException {
 		return new Payload().setJson(Json.toJson(json));
 	}
 }

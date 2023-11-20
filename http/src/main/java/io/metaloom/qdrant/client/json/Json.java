@@ -1,7 +1,6 @@
 package io.metaloom.qdrant.client.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -114,7 +113,7 @@ public final class Json {
 	public static <T extends RestModel> T parse(String json, Class<T> modelClass) {
 		try {
 			return mapper.readValue(json, modelClass);
-		} catch (JacksonException e) {
+		} catch (JsonProcessingException e) {
 			throw new RuntimeException(PARSE_ERROR, e);
 		}
 	}

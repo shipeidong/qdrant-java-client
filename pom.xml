@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.metaloom.qdrant</groupId>
 	<artifactId>qdrant-java-client</artifactId>
-	<version>0.13.0</version>
+	<version>0.13.1</version>
 
 	<parent>
-		<groupId>io.metaloom</groupId>
-		<artifactId>maven-parent</artifactId>
-		<version>2.0.2</version>
+		<groupId>com.haizhi</groupId>
+		<artifactId>haizhi-parent</artifactId>
+		<version>2.2.6</version>
 	</parent>
 
 	<packaging>pom</packaging>
@@ -20,22 +20,18 @@
 	<modules>
 		<module>common</module>
 		<module>http</module>
-		<module>grpc</module>
-		<module>report</module>
+<!--		<module>grpc</module>-->
+<!--		<module>report</module>-->
 	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Version against the client was tests -->
 		<!-- Currently this needs to be manually synced with QDrantContainer#DEFAULT_VERSION -->
-		<qdrant.version>v1.2.0</qdrant.version>
-		<okhttp.version>4.11.0</okhttp.version>
+		<qdrant.version>v1.4.1</qdrant.version>
 		<grpc.version>1.54.1</grpc.version>
 		<!-- Sonar -->
 		<jacoco.version>0.8.8</jacoco.version>
-		<sonar.version>3.9.1.2184</sonar.version>
-		<sonar.coverage.jacoco.xmlReportPaths>
-			${project.basedir}/../report/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<licenses>
@@ -83,158 +79,53 @@
 			<version>3.24.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
 	</dependencies>
 
-	<profiles>
-		<profile>
-			<id>coverage</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>${jacoco.version}</version>
-						<configuration>
-							<destFile>${sonar.jacoco.reportPath}</destFile>
-							<append>true</append>
-						</configuration>
-						<executions>
-							<execution>
-								<id>prepare-agent</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>sonar</id>
-			<properties>
-				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-				<sonar.organization>metaloom</sonar.organization>
-				<sonar.projectKey>metaloom_qdrant-java-client</sonar.projectKey>
-				<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
-				<sonar.report>${aggregate.report.dir}</sonar.report>
-			</properties>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.sonarsource.scanner.maven</groupId>
-						<artifactId>sonar-maven-plugin</artifactId>
-						<version>${sonar.version}</version>
-						<executions>
-							<execution>
-								<phase>verify</phase>
-								<goals>
-									<goal>sonar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+	<distributionManagement>
+		<repository>
+			<id>central</id>
+			<name>Haizhi Artifactory-releases</name>
+			<url>https://artifactory.haizhi.com:443/artifactory/libs-release</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Haizhi Artifactory-snapshots</name>
+			<url>https://artifactory.haizhi.com:443/artifactory/libs-snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
 
-		<profile>
-			<id>release</id>
-			<activation>
-				<property>
-					<name>release</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jreleaser</groupId>
-						<artifactId>jreleaser-maven-plugin</artifactId>
-						<inherited>false</inherited>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>4.0.5</version>
 				<executions>
 					<execution>
-						<id>attach-sources</id>
+						<id>get-the-git-infos</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>revision</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<release>17</release>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<prefix>git</prefix>
+					<verbose>false</verbose>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+					<gitDescribe>
+						<skip>false</skip>
+						<always>false</always>
+					</gitDescribe>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco.version}</version>
-				<executions>
-					<execution>
-						<id>report-aggregate</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>report-aggregate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.3.1</version>
-				<inherited>false</inherited>
-				<executions>
-					<execution>
-						<id>readme-md</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.basedir}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/.github/md</directory>
-									<includes>
-										<include>README.md</include>
-									</includes>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-							<encoding>UTF-8</encoding>
-							<mavenFilteringHints>
-								<mavenFilteringHint>snippetFilter</mavenFilteringHint>
-							</mavenFilteringHints>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>io.metaloom.maven</groupId>
-						<artifactId>snippet-resource-filter</artifactId>
-						<version>0.1.1</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>

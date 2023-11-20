@@ -4,12 +4,19 @@ import static io.metaloom.qdrant.client.util.VectorUtil.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.metaloom.qdrant.client.http.model.RestModel;
 import io.metaloom.qdrant.client.json.Json;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PointStruct implements RestModel {
 
 	@JsonProperty("id")
@@ -71,7 +78,7 @@ public class PointStruct implements RestModel {
 	}
 
 	@JsonIgnore
-	public PointStruct setPayload(String json) throws JacksonException {
+	public PointStruct setPayload(String json) throws JsonProcessingException {
 		setPayload(Json.toJson(json));
 		return this;
 	}
