@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.metaloom.qdrant.client.http.model.collection.filter.match.Match;
+import io.metaloom.qdrant.client.http.model.collection.filter.match.MatchAny;
 import io.metaloom.qdrant.client.http.model.collection.filter.match.MatchText;
 import io.metaloom.qdrant.client.http.model.collection.filter.match.MatchValue;
 
@@ -25,6 +26,9 @@ public class MatchDeserializer extends JsonDeserializer<Match> {
 		}
 		if (node.has("text")) {
 			return mapper.convertValue(node, MatchText.class);
+		}
+		if (node.has("any")) {
+			return mapper.convertValue(node, MatchAny.class);
 		}
 		throw new RuntimeException("Error while deserializing JSON. Unable to find match implementation for " + node.toPrettyString());
 	}
